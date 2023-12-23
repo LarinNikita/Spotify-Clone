@@ -48,7 +48,7 @@ const UploadModal = () => {
             const imageFile = values.image?.[0];
             const songFile = values.song?.[0];
 
-            if (!imageFile || !songFile || !user) {
+            if (!songFile || !user) {
                 toast.error("Missing fields");
                 return;
             }
@@ -73,20 +73,41 @@ const UploadModal = () => {
             }
 
             //Загрузка изображения
-            const {
-                data: imageData,
-                error: imageError
-            } = await supabaseClient
-                .storage
-                .from('images')
-                .upload(`image-${values.title}-${uniqueID}`, imageFile, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+            // const {
+            //     data: imageData,
+            //     error: imageError
+            // } = await supabaseClient
+            //     .storage
+            //     .from('images')
+            //     .upload(`image-${values.title}-${uniqueID}`, imageFile, {
+            //         cacheControl: '3600',
+            //         upsert: false
+            //     });
 
-            if (imageError) {
-                setIsLoading(false);
-                return toast.error('Failed image upload.');
+            // if (imageError) {
+            //     setIsLoading(false);
+            //     return toast.error('Failed image upload.');
+            // }
+
+            let imagePath;
+            if (values.image) {
+                const {
+                    data: imageData,
+                    error: imageError
+                } = await supabaseClient
+                    .storage
+                    .from('images')
+                    .upload(`image-${values.title}-${uniqueID}`, imageFile, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (imageError) {
+                    setIsLoading(false);
+                    return toast.error('Failed image upload.');
+                }
+
+                imagePath = imageData.path;
             }
 
             const {
@@ -97,7 +118,7 @@ const UploadModal = () => {
                     user_id: user.id,
                     title: values.title,
                     author: values.author,
-                    image_path: imageData.path,
+                    image_path: imagePath,
                     song_path: songData.path
                 });
 
@@ -156,14 +177,14 @@ const UploadModal = () => {
                 </div>
                 <div>
                     <div className="pb-1">
-                        Select an image
+                        Select an image (optional)
                     </div>
                     <Input
                         id="image"
                         type="file"
                         disabled={isLoading}
                         accept="image/*"
-                        {...register('image', { required: true })}
+                        {...register('image', { required: false })}
                     />
                 </div>
                 <Button
