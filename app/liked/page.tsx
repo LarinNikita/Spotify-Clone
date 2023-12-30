@@ -18,7 +18,7 @@ const Liked = async () => {
                                 fill
                                 src="/assets/liked.png"
                                 alt="Playlist"
-                                className="object-cover"
+                                className="object-cover rounded-md"
                             />
                         </div>
                         <div className="flex flex-col gap-y-2 mt-4 md:mt-0">
